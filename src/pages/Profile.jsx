@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-import "./Home.css"; // HomePage ilə eyni dizaynı istifadə edirik
+import "./Profile.css"; 
 import Navbar from "../pages/Navbar";
 
 export default function Profile() {
@@ -21,7 +20,7 @@ export default function Profile() {
 
     fetch("http://127.0.0.1:8000/profile/", {
       headers: {
-        "Authorization": `Bearer ${localStorage.getItem("access_token")}`, // əgər JWT istifadə edirsə
+        "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
       },
     })
       .then(res => res.json())
@@ -35,31 +34,31 @@ export default function Profile() {
       });
   }, [isAuthenticated, navigate]);
 
-  if (loading) return <p>Yüklənir...</p>;
-  if (!profile) return <p>İstifadəçi məlumatları tapılmadı.</p>;
+  if (loading) return <p className="loading">Yüklənir...</p>;
+  if (!profile) return <p className="error">İstifadəçi məlumatları tapılmadı.</p>;
 
   return (
-    <div className="homepage-container">
-      
+    <div className="profile-page">
       <Navbar />
+      <section className="profile-section">
+        <div className="profile-card">
+          <div className="avatar">
+            <img 
+              src={`https://ui-avatars.com/api/?name=${profile.first_name}+${profile.last_name}&background=7C3AED&color=fff`} 
+              alt="Profile Avatar" 
+            />
+          </div>
 
-      {/* Profile Section */}
-      <section className="hero-section" style={{ justifyContent: "flex-start", paddingTop: "50px" }}>
-        <div className="hero-text">
-          <h1>Salam, {profile.first_name}!</h1>
-          <p>İstifadəçi məlumatlarını burada görə və yeniləyə bilərsən.</p>
+          <h2 className="profile-name">{profile.first_name} {profile.last_name}</h2>
+          <p className="profile-username">@{profile.username}</p>
 
           <div className="profile-info">
-            <p><strong>Username:</strong> {profile.username}</p>
             <p><strong>Email:</strong> {profile.email}</p>
-            <p><strong>Ad:</strong> {profile.first_name}</p>
-            <p><strong>Soyad:</strong> {profile.last_name}</p>
             <p><strong>Telefon:</strong> {profile.phone || "Qeyd olunmayıb"}</p>
           </div>
 
-          {/* Daha sonra Update düyməsi əlavə edə bilərsən */}
-          <button className="btn-primary" onClick={() => alert("Update funksiyası hələ yoxdur")}>
-            Yenilə
+          <button className="btn-update" onClick={() => alert("Update funksiyası hələ yoxdur")}>
+            ✏️ Yenilə
           </button>
         </div>
       </section>

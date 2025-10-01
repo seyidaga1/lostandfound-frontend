@@ -1,0 +1,22 @@
+.secondary-nav {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.secondary-nav-container {
+  max-width: 1200px;
+  height: 20px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.nav-link {
+    cursor: pointer;
+}

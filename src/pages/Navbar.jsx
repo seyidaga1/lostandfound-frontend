@@ -34,16 +34,6 @@ export default function Navbar() {
         <i className="fa-solid fa-bars"></i>
       </div>
 
-      {/* Center links + search */}
-      <div className={`nav-center ${menuOpen ? "open" : ""}`}>
-        <ul className="nav-links">
-          <li onClick={() => navigate("/")}>HOME</li>
-          <li>CATEGORIES</li>
-          <li>ABOUT</li>
-          <li>CONTACT</li>
-        </ul>
-      </div>
-
       {/* Sağ tərəf (buttons və profile) */}
       <div className="nav-buttons">
         {isAuthenticated ? (
@@ -52,6 +42,7 @@ export default function Navbar() {
               className="fa-solid fa-user profile-icon"
               onClick={() => setProfileMenuOpen(!profileMenuOpen)}
             ></i>
+            
 
             {/* Dropdown */}
             <div className={`profile-dropdown ${profileMenuOpen ? "show" : ""}`}>
@@ -79,3 +70,5 @@ export default function Navbar() {
     </div>
   );
 }
+
+
