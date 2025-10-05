@@ -6,6 +6,7 @@ import { useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import "./Home.css"
 import Navbar from "../pages/Navbar"
+import Footer from "../pages/Footer"
 import Menu from "../pages/Menu"
 import CountUp from "react-countup"
 import { useInView } from "react-intersection-observer"
@@ -34,6 +35,16 @@ export default function HomePage() {
     triggerOnce: true,
     threshold: 0.6,
   })
+
+  // Contact form state
+  const [contactForm, setContactForm] = useState({
+    fullName: "",
+    email: "",
+    subject: "",
+    message: ""
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/pets/")
@@ -67,6 +78,58 @@ export default function HomePage() {
     console.log("Searching for:", searchQuery, "in", location)
   }
 
+  const handleContactChange = (e) => {
+    const { name, value } = e.target
+    setContactForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus(null)
+
+    try {
+      console.log("Form data before sending:", contactForm)
+
+      const response = await fetch("http://127.0.0.1:8000/contact/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: contactForm.fullName,
+          email: contactForm.email,
+          subject: contactForm.subject,
+          message: contactForm.message
+        })
+      })
+
+      const data = await response.json()
+      console.log("Response:", data)
+
+      if (response.ok) {
+        setSubmitStatus("success")
+        setContactForm({
+          fullName: "",
+          email: "",
+          subject: "",
+          message: ""
+        })
+      } else {
+        console.error("Error response:", data)
+        setSubmitStatus("error")
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      setSubmitStatus("error")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const filteredPets = selectedCategory
     ? pets.filter((p) => p.type === selectedCategory && p.status === "adopting")
     : pets.filter((p) => p.status === "adopting")
@@ -88,7 +151,7 @@ export default function HomePage() {
 
       <section className="category-section">
         <div className="category-grid">
-          <div className="category-card" onClick={() => handleCategorySelect("dog")}>
+          <div className="category-card"  onClick={() => navigate("/pets?type=dog")}>
             <div className="category-icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +163,7 @@ export default function HomePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                class="lucide lucide-dog-icon lucide-dog"
+                className="lucide lucide-dog-icon lucide-dog"
               >
                 <path d="M11.25 16.25h1.5L12 17z" />
                 <path d="M16 14v.5" />
@@ -112,7 +175,7 @@ export default function HomePage() {
             <p>İtlər</p>
           </div>
 
-          <div className="category-card" onClick={() => navigate("/pets/?")}>
+          <div className="category-card" onClick={() => navigate("/pets/?type=cat")}>
             <div className="category-icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +187,7 @@ export default function HomePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                class="lucide lucide-cat-icon lucide-cat"
+                className="lucide lucide-cat-icon lucide-cat"
               >
                 <path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z" />
                 <path d="M8 14v.5" />
@@ -135,7 +198,7 @@ export default function HomePage() {
             <p>Pişiklər</p>
           </div>
 
-          <div className="category-card" onClick={() => handleCategorySelect("other")}>
+          <div className="category-card"  onClick={() => navigate("/pets?type=bird")}>
             <div className="category-icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +210,7 @@ export default function HomePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                class="lucide lucide-bird-icon lucide-bird"
+                className="lucide lucide-bird-icon lucide-bird"
               >
                 <path d="M16 7h.01" />
                 <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20" />
@@ -160,7 +223,7 @@ export default function HomePage() {
             <p>Quşlar</p>
           </div>
 
-          <div className="category-card" onClick={() => handleCategorySelect("other")}>
+          <div className="category-card" onClick={() => navigate("/pets?type=fish")}>
             <div className="category-icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +235,7 @@ export default function HomePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                class="lucide lucide-fish-icon lucide-fish"
+                className="lucide lucide-fish-icon lucide-fish"
               >
                 <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
                 <path d="M18 12v.5" />
@@ -185,7 +248,7 @@ export default function HomePage() {
             <p>Balıqlar</p>
           </div>
 
-          <div className="category-card" onClick={() => handleCategorySelect("other")}>
+          <div className="category-card"  onClick={() => navigate("/pets?type=rabbit")}>
             <div className="category-icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -197,7 +260,7 @@ export default function HomePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                class="lucide lucide-rabbit-icon lucide-rabbit"
+                className="lucide lucide-rabbit-icon lucide-rabbit"
               >
                 <path d="M13 16a3 3 0 0 1 2.24 5" />
                 <path d="M18 12h.01" />
@@ -209,7 +272,7 @@ export default function HomePage() {
             <p>Dovşan</p>
           </div>
 
-          <div className="category-card" onClick={() => handleCategorySelect("other")}>
+          <div className="category-card"  onClick={() => navigate("/pets?type=other")}>
             <div className="category-icon">
               <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2">
                 <circle cx="12" cy="12" r="4" />
@@ -246,43 +309,180 @@ export default function HomePage() {
 
       <section className="about-section">
         <div className="hero-content">
-          <h1 className="hero-title">About Platform</h1>
+          <h1 className="hero-title">Haqqımızda</h1>
           <br />
-          <p className="hero-subtitle">Learn more about what we do and how our platform works.</p>
+          <p className="hero-subtitle">
+            Nə etdiyimizi və platformamızın necə işlədiyini daha ətraflı öyrənin.
+          </p>
         </div>
         <div className="about-container">
           <div className="about-card">
-            <h2>Our Mission</h2>
+            <h2>Missiyamız</h2>
             <p>
-              Our platform is designed to make it easy for people to explore categories, and find exactly what they're
-              looking for. We focus on simplicity, speed, and accessibility.
+              Platformamız insanların kateqoriyaları asanlıqla araşdırmasını və
+              məhz axtardıqları şeyi tapmasını təmin etmək üçün hazırlanıb. Biz sadəliyə
+              , sürətə və əlçatanlığa fokuslanırıq.
             </p>
           </div>
 
           <div className="about-card">
-            <h2>How It Works</h2>
+            <h2>Necə işləyir?</h2>
             <p>
-              The process is simple:
+              Proses çox sadədir:
               <br />
-              1. Browse through categories
+              1. Kateqoriyalara nəzər yetirin
               <br />
-              2. Use the search bar to quickly find items
+              2. Axtarış panelindən istifadə edərək tez bir zamanda tapın
               <br />
-              3. Check details and connect directly
+              3. Detallara baxın və birbaşa əlaqə saxlayın
               <br />
-              4. Create your own account to manage your profile
+              4. Öz hesabınızı yaradın və profilinizi idarə edin
             </p>
           </div>
 
           <div className="about-card">
-            <h2>Why Choose Us?</h2>
+            <h2>Niyə bizi seçməlisiniz?</h2>
             <p>
-              With a clean design, fast performance, and user-friendly interface, we make sure your experience is
-              smooth. Plus, your data is secure with modern authentication and encryption.
+              Təmiz dizayn, sürətli performans və istifadəçi dostu interfeys ilə sizin təcrübənizin rahat olmasını təmin edirik.
+              Üstəlik, müasir identifikasiya və şifrələmə ilə məlumatlarınız tam təhlükəsizlikdədir.
             </p>
           </div>
         </div>
       </section>
+
+      <section className="contact-section">
+        <div className="hero-content">
+          <h1 className="hero-title">Bizimlə Əlaqə</h1>
+          <br />
+          <p className="hero-subtitle">
+            Sizin suallarınız və rəyləriniz bizim üçün önəmlidir. Mesajınızı göndərin!
+          </p>
+        </div>
+
+        <div className="contact-container">
+          <div className="contact-form-wrapper">
+            <form className="contact-form" onSubmit={handleContactSubmit}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="fullName">
+                    Ad Soyad <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    value={contactForm.fullName}
+                    onChange={handleContactChange}
+                    required
+                    placeholder="Adınızı daxil edin"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="email">
+                    Email <span className="required">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={contactForm.email}
+                    onChange={handleContactChange}
+                    required
+                    placeholder="emailiniz@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="subject">
+                  Mövzu <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={contactForm.subject}
+                  onChange={handleContactChange}
+                  required
+                  placeholder="Mesajınızın mövzusu"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="message">
+                  Mesaj <span className="required">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={contactForm.message}
+                  onChange={handleContactChange}
+                  required
+                  placeholder="Mesajınızı buraya yazın..."
+                  rows="6"
+                />
+              </div>
+
+              {submitStatus === "success" && (
+                <div className="alert alert-success">
+                  ✓ Mesajınız uğurla göndərildi! Tezliklə sizinlə əlaqə saxlayacağıq.
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="alert alert-error">
+                  ✗ Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Göndərilir..." : "Göndər"}
+              </button>
+            </form>
+          </div>
+
+          <div className="contact-info">
+            <div className="info-card">
+              <div className="info-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <h3>Ünvan</h3>
+              <p>Bakı, Azərbaycan</p>
+            </div>
+
+            <div className="info-card">
+              <div className="info-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+              </div>
+              <h3>Email</h3>
+              <p>info@petadopt.az</p>
+            </div>
+
+            <div className="info-card">
+              <div className="info-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </div>
+              <h3>Telefon</h3>
+              <p>+994 XX XXX XX XX</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   )
 }
